@@ -1,6 +1,7 @@
 const fs = require("fs");
-
 var mysql = require("mysql");
+var inquirer = require('inquirer');
+
 var connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -20,7 +21,7 @@ function afterConnection() {
         if (err) throw err;
         console.log(res);
 
-        var inquirer = require('inquirer');
+        // var inquirer = require('inquirer');
 
         inquirer.prompt([{
                     type: "rawlist",
@@ -50,17 +51,21 @@ function afterConnection() {
                 if (chosenItem.stock_quantity < parseInt(answer.quantity)) {
                     connection.query(
                         "UPDATE products SET ? WHERE ?", [{
-                            stock_quantity: answer.quantity
-                        }],
+                                stock_quantity: answer.quantity
+                            },
+                            {
+                                item_id: chosenItem.item_id
+                            }
+                        ],
                         function(error) {
                             if (error) throw err;
-                            console.log("Bid placed successfully!");
+                            console.log("Congrats on your purchase");
                             start();
                         }
                     );
                 } else {
-                    // bid wasn't high enough, so apologize and start over
-                    console.log("Your bid was too low. Try again...");
+                    //insufficient quantity message
+                    console.log("Insufficient quantity");
                     start();
                 }
 
